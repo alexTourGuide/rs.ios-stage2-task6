@@ -17,7 +17,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self prefersStatusBarHidden];
     [self setupView];
     self.modalPresentationCapturesStatusBarAppearance = YES;
 }
@@ -31,7 +30,6 @@
 }
 
 - (void)setupView {
-//    self.view.frame = self.imageView.frame;
     UIImageView *imageView = [[UIImageView alloc] initWithImage: _image];
     
     [self.view addSubview:imageView];
@@ -43,10 +41,6 @@
         [imageView.heightAnchor constraintEqualToConstant:(self.view.frame.size.width - 30) * _image.size.height / _image.size.width]
     ]];
     
-}
-
--(BOOL)prefersStatusBarHidden{
-    return YES;
 }
 
 @end

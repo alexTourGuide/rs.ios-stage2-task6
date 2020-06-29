@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+@class PHAsset;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIImageView *iconMedia;
 @property (nonatomic, strong) UILabel *detailInfo;
 
-- (void)configureWithMediaItem:(NSString *)mediaItem;
+- (void)configureWithMediaItem:(PHAsset *)mediaItem;
 
 @end
 

@@ -8,6 +8,7 @@
 
 #import "MediaTableViewCell.h"
 #import "UIColor+RequiredColors.h"
+#import <Photos/Photos.h>
 
 @interface MediaTableViewCell ()
 
@@ -27,6 +28,9 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self setupViews];
+    UIView *backgroundView = [[UIView alloc] initWithFrame:self.bounds];
+    backgroundView.backgroundColor = [UIColor requiredYellowHighlightedColor];
+    self.selectedBackgroundView = backgroundView;
 }
 
 - (void)setupViews {
@@ -92,14 +96,87 @@
 }
 
 
-- (void)configureWithMediaItem:(NSString *)mediaItem {
-//    self.titleLable.text = mediaItem;
+- (void)configureWithMediaItem:(PHAsset *)mediaItem {
+        PHAsset *asset = mediaItem;
+        PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
+        [requestOptions setDeliveryMode:PHImageRequestOptionsDeliveryModeFastFormat];
+        requestOptions.resizeMode = PHImageRequestOptionsResizeModeExact;
+    
+        [[PHImageManager defaultManager] requestImageForAsset:asset
+                              targetSize:self.previewView.frame.size
+                             contentMode:PHImageContentModeAspectFit
+                                 options:requestOptions
+                           resultHandler:^(UIImage *result, NSDictionary *info) {
+         dispatch_async(dispatch_get_main_queue(), ^(void){
+             [self photoAuthorizationWithResult:result andAsset:asset];
+             self.titleLable.text = [asset valueForKey:@"filename"];
+             if ([asset mediaType] == PHAssetMediaTypeImage) {
+                 self.iconMedia.image = [UIImage imageNamed:@"image"];
+                 self.detailInfo.text = [NSString stringWithFormat:@"%@x%@", [asset valueForKey:@"pixelWidth"], [asset valueForKey:@"pixelHeight"]];
+             } else if ([asset mediaType] == PHAssetMediaTypeAudio) {
+                 self.iconMedia.image = [UIImage imageNamed:@"audio"];
+                 self.detailInfo.text = [NSString stringWithFormat:@"%@", [self getDurationWithFormat:asset.duration]];
+             } else if ([asset mediaType] == PHAssetMediaTypeVideo) {
+                 self.iconMedia.image = [UIImage imageNamed:@"video"];
+                 self.detailInfo.text = [NSString stringWithFormat:@"%@x%@ %@", [asset valueForKey:@"pixelWidth"], [asset valueForKey:@"pixelHeight"], [self getDurationWithFormat:asset.duration]];
+             } else {
+                 self.iconMedia.image = [UIImage imageNamed:@"other"];
+             }
+         });
+     }];
+}
+
+- (void)photoAuthorizationWithResult:(UIImage *)image andAsset:(PHAsset *)asset {
+    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+    switch (status) {
+        case PHAuthorizationStatusRestricted:
+            NSLog(@"Photo Auth restricted");
+            break;
+        
+        case PHAuthorizationStatusDenied:
+        NSLog(@"Photo Auth denied");
+        break;
+            
+        case PHAuthorizationStatusAuthorized:
+            if ([asset mediaType] == PHAssetMediaTypeUnknown) {
+                self.previewView.image = [UIImage imageNamed:@"other"];
+            } else if ([asset mediaType] == PHAssetMediaTypeAudio) {
+                self.previewView.image = [UIImage imageNamed:@"audio"];
+            } else {
+                self.previewView.image = image;
+            }
+        break;
+        
+        case PHAuthorizationStatusNotDetermined:
+            [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+                switch (status) {
+                    case PHAuthorizationStatusAuthorized:
+                        if ([asset mediaType] == PHAssetMediaTypeUnknown) {
+                            self.previewView.image = [UIImage imageNamed:@"other"];
+                        } else if ([asset mediaType] == PHAssetMediaTypeAudio) {
+                            self.previewView.image = [UIImage imageNamed:@"audio"];
+                        } else {
+                            self.previewView.image = image;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }];
+        break;
+    }
+}
+
+- (NSString*)getDurationWithFormat:(NSTimeInterval)duration {
+    NSInteger ti = (NSInteger)duration;
+    NSInteger seconds = ti % 60;
+    NSInteger minutes = (ti / 60) % 60;
+    NSInteger hours = (ti / 3600);
+    return [NSString stringWithFormat:@"%02ld:%02ld:%02ld", (long)hours, (long)minutes, (long)seconds];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
+    
 }
 
 @end

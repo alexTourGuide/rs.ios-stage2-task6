@@ -7,18 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+@class PHAsset;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DetailMediaViewController : UIViewController
 
-@property (nonatomic, strong) UIImage *image;
-@property (nonatomic, strong) NSString *filename;
-@property (nonatomic, strong) NSDate *creationDate;
-@property (nonatomic, strong) NSDate *modificationDate;
-@property (nonatomic, strong) NSString *mediaType;
+@property (nonatomic, strong) PHAsset *mediaItem;
 
-- (instancetype)initWithImage:(UIImage *)image withFilename:(NSString *)filename withCreationDate:(NSDate *)creationDate withModificationDate:(NSDate *)modificationDate withMediaType:(NSString *)mediaType;
+- (instancetype)initWithMediaItem:(PHAsset *)mediaItem;
 
 @end
 

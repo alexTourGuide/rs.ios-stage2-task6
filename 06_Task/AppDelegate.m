@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "ViewController.h"
+#import "UIColor+RequiredColors.h"
 
 @interface AppDelegate ()
 
@@ -17,10 +18,10 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
     if (@available(iOS 13.0, *)) {
         return YES;
     } else {
+        [[UINavigationBar appearance] setBarTintColor:[UIColor requiredYellowColor]];
         UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
         window.rootViewController = [[UINavigationController alloc] initWithRootViewController: [ViewController new]];
         self.window = window;

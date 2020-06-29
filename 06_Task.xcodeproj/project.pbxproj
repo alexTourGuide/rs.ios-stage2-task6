@@ -13,10 +13,11 @@
 		F3257028249E49FF009766B0 /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F3257027249E49FF009766B0 /* FirstViewController.m */; };
 		F326440124A1AFDE00919440 /* DetailMediaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F326440024A1AFDE00919440 /* DetailMediaViewController.m */; };
 		F3266059249E0AFC005E5DC1 /* SecondTabViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F3266058249E0AFC005E5DC1 /* SecondTabViewController.m */; };
+		F327391B24A9164B007024D4 /* UIView+Figures.m in Sources */ = {isa = PBXBuildFile; fileRef = F327391A24A9164B007024D4 /* UIView+Figures.m */; };
 		F327C28024A28B8300C9418B /* ActivityViewCustomActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = F327C27F24A28B8300C9418B /* ActivityViewCustomActivity.m */; };
 		F3296CCA249F77450094D242 /* MediaTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F3296CC9249F77450094D242 /* MediaTableViewCell.m */; };
-		F3296CCD249F94060094D242 /* MediaItem.m in Sources */ = {isa = PBXBuildFile; fileRef = F3296CCC249F94060094D242 /* MediaItem.m */; };
 		F32C65FA24A4F5480031A7C3 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = F32C65F824A4F5480031A7C3 /* Constants.m */; };
+		F3371EB224AA3C9300669F23 /* ShowAlertMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = F3371EB124AA3C9300669F23 /* ShowAlertMessage.m */; };
 		F3A13185249D2358001B9F69 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F3A13184249D2358001B9F69 /* AppDelegate.m */; };
 		F3A13188249D2358001B9F69 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F3A13187249D2358001B9F69 /* SceneDelegate.m */; };
 		F3A1318B249D2358001B9F69 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F3A1318A249D2358001B9F69 /* ViewController.m */; };
@@ -39,14 +40,16 @@
 		F326440024A1AFDE00919440 /* DetailMediaViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailMediaViewController.m; sourceTree = "<group>"; };
 		F3266057249E0AFC005E5DC1 /* SecondTabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecondTabViewController.h; sourceTree = "<group>"; };
 		F3266058249E0AFC005E5DC1 /* SecondTabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecondTabViewController.m; sourceTree = "<group>"; };
+		F327391924A9164B007024D4 /* UIView+Figures.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+Figures.h"; sourceTree = "<group>"; };
+		F327391A24A9164B007024D4 /* UIView+Figures.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIView+Figures.m"; sourceTree = "<group>"; };
 		F327C27E24A28B8300C9418B /* ActivityViewCustomActivity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActivityViewCustomActivity.h; sourceTree = "<group>"; };
 		F327C27F24A28B8300C9418B /* ActivityViewCustomActivity.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ActivityViewCustomActivity.m; sourceTree = "<group>"; };
 		F3296CC8249F77450094D242 /* MediaTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediaTableViewCell.h; sourceTree = "<group>"; };
 		F3296CC9249F77450094D242 /* MediaTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediaTableViewCell.m; sourceTree = "<group>"; };
-		F3296CCB249F94060094D242 /* MediaItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediaItem.h; sourceTree = "<group>"; };
-		F3296CCC249F94060094D242 /* MediaItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediaItem.m; sourceTree = "<group>"; };
 		F32C65F824A4F5480031A7C3 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		F32C65F924A4F5480031A7C3 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		F3371EB024AA3C9300669F23 /* ShowAlertMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShowAlertMessage.h; sourceTree = "<group>"; };
+		F3371EB124AA3C9300669F23 /* ShowAlertMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShowAlertMessage.m; sourceTree = "<group>"; };
 		F3A13180249D2358001B9F69 /* 06_Task.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 06_Task.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3A13183249D2358001B9F69 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		F3A13184249D2358001B9F69 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -106,8 +109,6 @@
 				F327C27F24A28B8300C9418B /* ActivityViewCustomActivity.m */,
 				F3296CC8249F77450094D242 /* MediaTableViewCell.h */,
 				F3296CC9249F77450094D242 /* MediaTableViewCell.m */,
-				F3296CCB249F94060094D242 /* MediaItem.h */,
-				F3296CCC249F94060094D242 /* MediaItem.m */,
 				F3266057249E0AFC005E5DC1 /* SecondTabViewController.h */,
 				F3266058249E0AFC005E5DC1 /* SecondTabViewController.m */,
 				F3257023249E477C009766B0 /* ThirdViewController.h */,
@@ -118,6 +119,10 @@
 				F325701A249E1AC5009766B0 /* GalleryCollectionViewCell.m */,
 				F3A1319F249D25CC001B9F69 /* UIColor+RequiredColors.h */,
 				F3A131A0249D25CC001B9F69 /* UIColor+RequiredColors.m */,
+				F327391924A9164B007024D4 /* UIView+Figures.h */,
+				F327391A24A9164B007024D4 /* UIView+Figures.m */,
+				F3371EB024AA3C9300669F23 /* ShowAlertMessage.h */,
+				F3371EB124AA3C9300669F23 /* ShowAlertMessage.m */,
 				F32C65F924A4F5480031A7C3 /* Constants.h */,
 				F32C65F824A4F5480031A7C3 /* Constants.m */,
 				F3A1318F249D235A001B9F69 /* Assets.xcassets */,
@@ -203,11 +208,12 @@
 				F3A1318B249D2358001B9F69 /* ViewController.m in Sources */,
 				F3A13185249D2358001B9F69 /* AppDelegate.m in Sources */,
 				F32C65FA24A4F5480031A7C3 /* Constants.m in Sources */,
-				F3296CCD249F94060094D242 /* MediaItem.m in Sources */,
+				F327391B24A9164B007024D4 /* UIView+Figures.m in Sources */,
 				F3A13196249D235A001B9F69 /* main.m in Sources */,
 				F326440124A1AFDE00919440 /* DetailMediaViewController.m in Sources */,
 				F3A131A1249D25CC001B9F69 /* UIColor+RequiredColors.m in Sources */,
 				F327C28024A28B8300C9418B /* ActivityViewCustomActivity.m in Sources */,
+				F3371EB224AA3C9300669F23 /* ShowAlertMessage.m in Sources */,
 				F3257025249E477C009766B0 /* ThirdViewController.m in Sources */,
 				F3257022249E38FA009766B0 /* ImageViewController.m in Sources */,
 				F3266059249E0AFC005E5DC1 /* SecondTabViewController.m in Sources */,

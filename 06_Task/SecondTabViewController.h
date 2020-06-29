@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SecondTabViewController : UIViewController 
+@interface SecondTabViewController : UIViewController
 
 @end
 

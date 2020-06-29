@@ -12,16 +12,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIColor (RequiredColors)
 
-+ (UIColor *)ReqBlackColor;
-+ (UIColor *)ReqWhiteColor;
-+ (UIColor *)ReqRedColor;
-+ (UIColor *)ReqBlueColor;
-+ (UIColor *)ReqGreenColor;
-+ (UIColor *)ReqYellowColor;
-+ (UIColor *)ReqGrayColor;
-+ (UIColor *)ReqYellowHighlightedColor;
++ (UIColor *)requiredBlackColor;
++ (UIColor *)requiredWhiteColor;
++ (UIColor *)requiredRedColor;
++ (UIColor *)requiredBlueColor;
++ (UIColor *)requiredGreenColor;
++ (UIColor *)requiredYellowColor;
++ (UIColor *)requiredGrayColor;
++ (UIColor *)requiredYellowHighlightedColor;
 
-+ (UIColor *)colorWithHexString:(NSString *) hexString;
++ (UIColor *)colorWithHexString:(NSString *)hexString;
 
 @end
 

@@ -12,45 +12,34 @@
 #import "ImageViewController.h"
 #import <Photos/Photos.h>
 #import <AVKit/AVKit.h>
+#import "ShowAlertMessage.h"
 
 @interface SecondTabViewController () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, PHPhotoLibraryChangeObserver>
 
-@property (nonatomic, strong) UIView *upperHeader;
-@property (nonatomic, strong) UILabel *titleHeader;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, assign) int numberOfColumns;
-
-@property(nonatomic , strong) PHFetchResult *assetsFetchResults;
-@property(nonatomic , strong) PHCachingImageManager *imageManager;
+@property (nonatomic , strong) PHFetchResult *assetsFetchResults;
+@property (nonatomic , strong) PHCachingImageManager *imageManager;
 
 @end
 
 @implementation SecondTabViewController
 
-#pragma mark - Methods of View Controller's lifecycle
+#pragma mark - Life cycle's methods
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self prefersStatusBarHidden];
-    self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    
+    [self setupCollectionView];
+    self.numberOfColumns = 3;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self.navigationController setNavigationBarHidden:YES];
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        if (status == PHAuthorizationStatusAuthorized) {
-            [PHPhotoLibrary.sharedPhotoLibrary registerChangeObserver:self];
-        }
-    }];
-    [self fetchGalleryAndSort];
-    self.numberOfColumns = 3;
-    
-    [self setupViews];
+    [self setupNavigationBar];
+    [self fetchGalleryAndSort];    
 }
 
-
 - (void)viewWillDisappear:(BOOL)animated {
+    [self setNeedsStatusBarAppearanceUpdate];
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
         if (status == PHAuthorizationStatusAuthorized) {
             [PHPhotoLibrary.sharedPhotoLibrary unregisterChangeObserver:self];
@@ -60,32 +49,33 @@
 
 #pragma mark - Setup views
 
-- (void)setupViews {
-    // Setup upperHeader
-    self.upperHeader = [UIView new];
-    self.upperHeader.backgroundColor = [UIColor ReqYellowColor];
-    [self.view addSubview:self.upperHeader];
-    self.upperHeader.translatesAutoresizingMaskIntoConstraints = NO;
+- (void)setupCollectionView {
+    self.view.backgroundColor = [UIColor requiredWhiteColor];
     
-    // Setup title
-    self.titleHeader = [UILabel new];
-    self.titleHeader.text = @"Gallery";
-    self.titleHeader.font = [UIFont systemFontOfSize:20.0 weight:UIFontWeightSemibold];
-    [self.upperHeader addSubview:self.titleHeader];
-    self.titleHeader.translatesAutoresizingMaskIntoConstraints = NO;
-
-    // Collection View
     self.collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:[UICollectionViewFlowLayout new]];
-    self.collectionView.backgroundColor = [UIColor ReqWhiteColor];
+    self.collectionView.backgroundColor = [UIColor requiredWhiteColor];
     [self.view addSubview:self.collectionView];
     self.collectionView.translatesAutoresizingMaskIntoConstraints = NO;
     
-    // Setup constraints
-    [self setupConstraints];
+    if (@available(iOS 11.0, *)) {
+        [NSLayoutConstraint activateConstraints:@[
+            [self.collectionView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
+            [self.collectionView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
+            [self.collectionView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor],
+            [self.collectionView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
+        ]];
+    } else {
+        [NSLayoutConstraint activateConstraints:@[
+            [self.collectionView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+            [self.collectionView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+            [self.collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+            [self.collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
+        ]];
+    }
 
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
-    [self.collectionView registerClass:GalleryCollectionViewCell.class forCellWithReuseIdentifier:@"prevCellIdentifier"];
+    [self.collectionView registerClass:GalleryCollectionViewCell.class forCellWithReuseIdentifier:@"previewCellIdentifier"];
 }
 
 #pragma mark - CollectionView DataSours methods
@@ -99,40 +89,19 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    GalleryCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"prevCellIdentifier" forIndexPath:indexPath];
-    
-    PHAsset *asset = _assetsFetchResults[indexPath.item];
-    PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
-    [requestOptions setSynchronous:YES];
-    [requestOptions setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
-    [_imageManager requestImageForAsset:asset
-                             targetSize:cell.imageView.frame.size
-                            contentMode:PHImageContentModeAspectFit
-                                options:requestOptions
-                          resultHandler:^(UIImage *result, NSDictionary *info) {
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            [self photoAuthorizationWithCell:cell andResult:result andAsset:asset];
-        });
-    }];
-    
+    GalleryCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"previewCellIdentifier" forIndexPath:indexPath];
+    [cell configureWithItem:_assetsFetchResults[indexPath.item]];
     return cell;
 }
 
 #pragma mark - CollectionView Delegate methods
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationLandscapeRight) {
-        return UIEdgeInsetsMake(10, 50, 10, 10);
-    } else if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationLandscapeLeft) {
-        return UIEdgeInsetsMake(10, 10, 10, 50);
-    } else {
     return UIEdgeInsetsMake(10, 10, 10, 10);
-    }
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    CGFloat width = (([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationLandscapeRight) || ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationLandscapeLeft)) ? (self.view.bounds.size.width - (35 * self.numberOfColumns)) / self.numberOfColumns : (self.view.bounds.size.width - (15 * self.numberOfColumns)) / self.numberOfColumns;
+    CGFloat width = ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait) ? (self.view.bounds.size.width - (15 * self.numberOfColumns)) / self.numberOfColumns : (self.view.bounds.size.width - (55 * self.numberOfColumns)) / self.numberOfColumns;
     return CGSizeMake(width, width);
 }
 
@@ -141,20 +110,20 @@
     PHAsset *asset = _assetsFetchResults[indexPath.item];
     
     if ([asset mediaType] == PHAssetMediaTypeImage) {
-    CGFloat retinaMultiplier = [[UIScreen mainScreen] scale];
-    CGSize size = CGSizeMake(self.view.bounds.size.width * retinaMultiplier, asset.pixelWidth / asset.pixelHeight * retinaMultiplier);
-    PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
-    [requestOptions setSynchronous:YES];
-    [requestOptions setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
+        CGFloat retinaMultiplier = [[UIScreen mainScreen] scale];
+        CGSize size = CGSizeMake(self.view.bounds.size.width * retinaMultiplier, asset.pixelWidth / asset.pixelHeight * retinaMultiplier);
+        
+        PHImageRequestOptions *requestOptions = [PHImageRequestOptions new];
+        [requestOptions setSynchronous:YES];
+        [requestOptions setDeliveryMode:PHImageRequestOptionsDeliveryModeHighQualityFormat];
     
-    __block UIImage *image;
-    
-    [_imageManager requestImageForAsset:asset
+        __block UIImage *image;
+        [_imageManager requestImageForAsset:asset
                              targetSize:size
                             contentMode:PHImageContentModeAspectFill
                                 options:requestOptions resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        image = result;
-    }];
+            image = result;
+        }];
     
     [self presentViewController:[[ImageViewController alloc] initWithImage:image] animated:YES completion:nil];
         
@@ -178,116 +147,70 @@
 
 #pragma mark - Helpers
 
-- (void)setupConstraints {
-    if (([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait) && ((int)[[UIScreen mainScreen] nativeBounds].size.height <= 1335)) {
-        [NSLayoutConstraint activateConstraints:@[
-            [self.upperHeader.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.upperHeader.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-            [self.upperHeader.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.upperHeader.heightAnchor constraintEqualToConstant:50.0],
-
-            [self.titleHeader.centerXAnchor constraintEqualToAnchor:self.upperHeader.centerXAnchor],
-            [self.titleHeader.centerYAnchor constraintEqualToAnchor:self.upperHeader.centerYAnchor],
-
-            [self.collectionView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.collectionView.topAnchor constraintEqualToAnchor:self.upperHeader.bottomAnchor],
-            [self.collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
-    ]];
-    } else
-        if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait) {
-        [NSLayoutConstraint activateConstraints:@[
-            [self.upperHeader.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.upperHeader.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-            [self.upperHeader.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.upperHeader.heightAnchor constraintEqualToConstant:90.0],
-
-            [self.titleHeader.centerXAnchor constraintEqualToAnchor:self.upperHeader.centerXAnchor],
-            [self.titleHeader.bottomAnchor constraintEqualToAnchor:self.upperHeader.bottomAnchor constant:-18.0],
-
-            [self.collectionView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.collectionView.topAnchor constraintEqualToAnchor:self.upperHeader.bottomAnchor],
-            [self.collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
-    ]];
-    } else {
-        [NSLayoutConstraint activateConstraints:@[
-            [self.upperHeader.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.upperHeader.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-            [self.upperHeader.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.upperHeader.heightAnchor constraintEqualToConstant:50.0],
-
-            [self.titleHeader.centerXAnchor constraintEqualToAnchor:self.upperHeader.centerXAnchor],
-            [self.titleHeader.centerYAnchor constraintEqualToAnchor:self.upperHeader.centerYAnchor],
-
-            [self.collectionView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.collectionView.topAnchor constraintEqualToAnchor:self.upperHeader.bottomAnchor],
-            [self.collectionView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.collectionView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
-        ]];
-    }
-}
-
-- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
-    [super traitCollectionDidChange:previousTraitCollection];
-    [self.collectionView updateConstraints];
-}
-
-- (BOOL)prefersStatusBarHidden{
-    return YES;
-}
-
-- (void)photoAuthorizationWithCell:(GalleryCollectionViewCell *)cell andResult:(UIImage *)image andAsset:(PHAsset *)asset {
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    switch (status) {
-        case PHAuthorizationStatusRestricted:
-            NSLog(@"Photo Auth restricted");
-            break;
-        
-        case PHAuthorizationStatusDenied:
-        NSLog(@"Photo Auth denied");
-        break;
-            
-        case PHAuthorizationStatusAuthorized:
-            if ([asset mediaType] == PHAssetMediaTypeUnknown) {
-                cell.imageView.image = [UIImage imageNamed:@"other"];
-            } else {
-                cell.imageView.image = image;
-            }
-        break;
-        
-        case PHAuthorizationStatusNotDetermined:
-            [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-                switch (status) {
-                    case PHAuthorizationStatusAuthorized:
-                        if ([asset mediaType] == PHAssetMediaTypeUnknown) {
-                            cell.imageView.image = [UIImage imageNamed:@"other"];
-                        } else {
-                            cell.imageView.image = image;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }];
-        break;
-    }
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [self.collectionView.collectionViewLayout invalidateLayout];
 }
 
 - (void)fetchGalleryAndSort {
+    // Request for authorization
+    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        switch (status) {
+            case PHAuthorizationStatusAuthorized:
+                [PHPhotoLibrary.sharedPhotoLibrary registerChangeObserver:self];
+                break;
+            case PHAuthorizationStatusDenied:
+                [[ShowAlertMessage alloc] showLibraryAccessAlert:self title:@"Access to user's library" message:@"Authorization denied. Please go to app's settings to allow access"];
+                break;
+            case PHAuthorizationStatusRestricted:
+                [[ShowAlertMessage alloc] showLibraryAccessAlert:self title:@"Access to user's library" message:@"Authorization restricted. Please go to app's settings to allow access"];
+                break;
+            default:
+                break;
+        }
+    }];
     // Fetch all assets, sorted by date created.
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate"
                                                               ascending:NO]];
-    _assetsFetchResults = [PHAsset fetchAssetsWithOptions:options];
-
-    _imageManager = [[PHCachingImageManager alloc] init];
+    self.assetsFetchResults = [PHAsset fetchAssetsWithOptions:options];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.collectionView reloadData];
+    });
+    
+    self.imageManager = [PHCachingImageManager new];
 }
 
+- (void)setupNavigationBar {
+    [self.navigationController setNavigationBarHidden:NO animated:NO];
+    self.navigationController.tabBarItem.title = @"Gallery";
+    
+    if (@available(iOS 13, *)) {
+        [self.navigationController navigationBar].standardAppearance = [UINavigationBarAppearance new];
+        [[self.navigationController navigationBar].standardAppearance configureWithDefaultBackground];
+        
+        [self.navigationController navigationBar].standardAppearance.backgroundColor = [UIColor requiredYellowColor];
+        [self.navigationController navigationBar].standardAppearance.titleTextAttributes = @{
+            NSForegroundColorAttributeName: [UIColor requiredBlackColor],
+            NSFontAttributeName:[UIFont systemFontOfSize:18.0
+                                                  weight:UIFontWeightSemibold]};
+    }
+    else {
+        [self.navigationController navigationBar].barTintColor = [UIColor requiredYellowColor];
+        [self.navigationController navigationBar].titleTextAttributes = @{
+            NSForegroundColorAttributeName: [UIColor requiredBlackColor],
+            NSFontAttributeName:[UIFont systemFontOfSize:18.0
+                                                  weight:UIFontWeightSemibold]
+        };
+    }
+    self.navigationController.topViewController.title = @"Gallery";
+}
 
 #pragma mark - <PHPhotoLibraryChangeObserver>
 
 - (void)photoLibraryDidChange:(PHChange *)changeInstance {
+    NSLog(@"Photo Library Did Change");
 
     dispatch_async(dispatch_get_main_queue(), ^{
 

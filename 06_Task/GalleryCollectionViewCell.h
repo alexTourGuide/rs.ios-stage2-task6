@@ -7,12 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+@class PHAsset;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface GalleryCollectionViewCell : UICollectionViewCell
 
 @property (nonatomic, strong) UIImageView *imageView;
+
+- (void)configureWithItem:(PHAsset *)item;
 
 @end
 

@@ -18,7 +18,7 @@
 
 
 - (void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions  API_AVAILABLE(ios(13.0)){
-    [[UINavigationBar appearance] setBarTintColor:[UIColor ReqYellowColor]];
+    [[UINavigationBar appearance] setBarTintColor:[UIColor requiredYellowColor]];
     
     UIWindow *window = [[UIWindow alloc] initWithWindowScene:(UIWindowScene *)scene];
     window.rootViewController = [[UINavigationController alloc] initWithRootViewController: [ViewController new]];
